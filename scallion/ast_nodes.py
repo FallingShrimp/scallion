@@ -1,29 +1,20 @@
 """Scallion 剧本描述语言的抽象语法树节点定义"""
 
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from __future__ import annotations
 
-
-# ─── 顶层节点 ───────────────────────────────────────────
-
-
-@dataclass
-class Script:
-    """整个剧本的根节点"""
-
-    statements: List["Statement"]
+from pydantic import BaseModel, Field
 
 
 # ─── 语句基类 ───────────────────────────────────────────
 
 
-class Statement:
+class Statement(BaseModel):
     """所有语句的基类"""
 
-    pass
+
+# ─── 具体语句 ───────────────────────────────────────────
 
 
-@dataclass
 class Enter(Statement):
     """enter Name:emotion —— 角色声明（冒号后为心情）"""
 
@@ -31,21 +22,18 @@ class Enter(Statement):
     emotion: str
 
 
-@dataclass
 class Focus(Statement):
     """focus Name —— 聚焦角色（后续 talk 由该角色发言）"""
 
     name: str
 
 
-@dataclass
 class Unfocus(Statement):
     """unfocus Name —— 取消聚焦"""
 
     name: str
 
 
-@dataclass
 class Talk(Statement):
     """
     talk& text  —— 自动推进（动画播完自动进入下一句，配合 select 使用）
@@ -56,26 +44,23 @@ class Talk(Statement):
     auto_advance: bool = False  # True = talk& (自动), False = talk (等待点击)
 
 
-@dataclass
 class Select(Statement):
     """select { options } -> variable —— 分支选择"""
 
-    options: List[str]
+    options: list[str]
     variable: str
 
 
-@dataclass
 class Jump(Statement):
     """
     jump label           —— 无条件跳转（condition=None, mappings={}）
     jump var { 0:l1, 1:l2 } —— 条件跳转
     """
 
-    condition: Optional[str] = None  # 条件变量名；None 表示无条件跳转
-    mappings: Dict[str, str] = field(default_factory=dict)  # 值 → 标签
+    condition: str | None = None  # 条件变量名；None 表示无条件跳转
+    mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
 
 
-@dataclass
 class LabeledStatement(Statement):
     """label#action —— 带标签的语句"""
 
@@ -83,8 +68,14 @@ class LabeledStatement(Statement):
     statement: Statement
 
 
-@dataclass
 class Exit(Statement):
     """exit —— 终止"""
 
-    pass
+
+# ─── 顶层节点 ───────────────────────────────────────────
+
+
+class Script(BaseModel):
+    """整个剧本的根节点"""
+
+    statements: list[Statement] = Field(default_factory=list)
