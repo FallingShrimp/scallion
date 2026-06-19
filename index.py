@@ -3,7 +3,7 @@
 from scallion import Scallion
 
 # 读取示例剧本
-with open('article.txt', 'r', encoding='utf-8') as f:
+with open("article.txt", "r", encoding="utf-8") as f:
     source = f.read()
 
 print("=" * 50)
@@ -25,7 +25,7 @@ print("结构化摘要:")
 print("=" * 50)
 print(f"角色数: {len(script.enters)}")
 for e in script.enters:
-    print(f"  - {e.name} (标签: {e.label})")
+    print(f"  - {e.name} (心情: {e.emotion})")
 print(f"语句数: {len(script.statements)}")
 for s in script.statements:
     print(f"  - {type(s).__name__}")

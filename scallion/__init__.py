@@ -1,10 +1,7 @@
 """Scallion —— 高效剧本描述语言解析器"""
 
-from .parser import Parser, ParseError, tokenize
-from .ast_nodes import (
-    Script, Enter, Focus, Unfocus, Talk,
-    Select, Jump, LabeledStatement, Exit, Statement,
-)
+from .parser import Parser
+from .ast_nodes import Script
 from .visualizer import print_ast
 
 
@@ -20,7 +17,7 @@ class Scallion:
     @staticmethod
     def parse_file(filepath: str) -> Script:
         """从文件解析，返回 AST"""
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, "r", encoding="utf-8") as f:
             return Scallion.parse(f.read())
 
     @staticmethod
