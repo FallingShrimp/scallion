@@ -154,17 +154,9 @@ class Parser:
     # ── 顶层解析 ─────────────────────────────────────
 
     def parse(self) -> Script:
-        """Script → Enter* Statement*"""
-        enters: List[Enter] = []
+        """Script → Statement*"""
         statements: List[Statement] = []
 
-        self.skip_newlines()
-
-        # 解析 enter 声明（集中在开头）
-        while self.check("ENTER"):
-            enters.append(self.parse_enter())
-
-        # 解析语句
         while self.pos < len(self.tokens):
             self.skip_newlines()
             if self.pos >= len(self.tokens):
@@ -173,7 +165,7 @@ class Parser:
             if stmt is not None:
                 statements.append(stmt)
 
-        return Script(enters=enters, statements=statements)
+        return Script(statements=statements)
 
     def parse_enter(self) -> Enter:
         """enter ID : ID NEWLINE"""
@@ -206,7 +198,8 @@ class Parser:
 
     def parse_action(self) -> Statement:
         """
-        Action → focus ID NEWLINE
+        Action → enter ID : ID NEWLINE
+               | focus ID NEWLINE
                | unfocus ID NEWLINE
                | TALK_AUTO TEXT NEWLINE
                | TALK_CLICK TEXT NEWLINE
@@ -216,7 +209,10 @@ class Parser:
         """
         tok = self.current
 
-        if tok.kind == "FOCUS":
+        if tok.kind == "ENTER":
+            return self.parse_enter()
+
+        elif tok.kind == "FOCUS":
             self.advance()
             name = self.consume("ID", "角色名").value
             self.consume("NEWLINE")

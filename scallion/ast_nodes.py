@@ -11,19 +11,7 @@ from typing import List, Dict, Optional
 class Script:
     """整个剧本的根节点"""
 
-    enters: List["Enter"]
     statements: List["Statement"]
-
-
-# ─── 元信息 ─────────────────────────────────────────────
-
-
-@dataclass
-class Enter:
-    """enter Name:emotion —— 角色声明（冒号后为心情）"""
-
-    name: str
-    emotion: str
 
 
 # ─── 语句基类 ───────────────────────────────────────────
@@ -33,6 +21,14 @@ class Statement:
     """所有语句的基类"""
 
     pass
+
+
+@dataclass
+class Enter(Statement):
+    """enter Name:emotion —— 角色声明（冒号后为心情）"""
+
+    name: str
+    emotion: str
 
 
 @dataclass

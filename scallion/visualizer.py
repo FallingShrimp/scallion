@@ -2,6 +2,7 @@
 
 from .ast_nodes import (
     Script,
+    Enter,
     Focus,
     Unfocus,
     Talk,
@@ -27,14 +28,6 @@ def _indent(level: int) -> str:
 def _print_script(script: Script, lines: list[str], indent: int):
     lines.append(f"{_indent(indent)}Script")
 
-    # 角色声明
-    if script.enters:
-        lines.append(f"{_indent(indent + 1)}enters:")
-        for e in script.enters:
-            lines.append(
-                f"{_indent(indent + 2)}Enter(name={e.name!r}, emotion={e.emotion!r})"
-            )
-
     # 语句
     if script.statements:
         lines.append(f"{_indent(indent + 1)}statements:")
@@ -48,6 +41,9 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
     if isinstance(stmt, LabeledStatement):
         lines.append(f"{prefix}LabeledStatement(label={stmt.label!r}):")
         _print_stmt(stmt.statement, lines, indent + 1)
+
+    elif isinstance(stmt, Enter):
+        lines.append(f"{prefix}Enter(name={stmt.name!r}, emotion={stmt.emotion!r})")
 
     elif isinstance(stmt, Focus):
         lines.append(f"{prefix}Focus(name={stmt.name!r})")
