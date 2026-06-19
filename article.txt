@@ -1,0 +1,19 @@
+enter Tera:a
+enter Pico:b
+focus Tera
+talk& 你好Pico，你吃饭了吗？？？
+select {
+    Pico吃饭了
+    Pico没吃饭
+} -> eat?
+unfocus Tera
+focus Pico
+jump eat? {
+    0:eaten
+    1:uneaten
+}
+eaten#talk 你好Tera！我已经吃饭了。
+jump e
+uneaten#talk 你好Tera！我还没吃饭。
+jump e
+e#exit
