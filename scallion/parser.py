@@ -155,7 +155,7 @@ class Parser:
 
     def parse(self) -> Script:
         """Script → Statement*"""
-        statements: List[Statement] = []
+        statements: list[Statement] = []
 
         while self.pos < len(self.tokens):
             self.skip_newlines()
@@ -165,7 +165,7 @@ class Parser:
             if stmt is not None:
                 statements.append(stmt)
 
-        return Script(statements=statements)
+        return Script(statements=statements)  # type: ignore[arg-type]
 
     def parse_enter(self) -> Enter:
         """enter ID : ID NEWLINE"""
@@ -190,9 +190,9 @@ class Parser:
             if self.check("NEWLINE"):
                 # label# 后面没有内容，视为 exit
                 self.advance()
-                return LabeledStatement(label=label, statement=Exit())
+                return LabeledStatement(label=label, statement=Exit())  # type: ignore[arg-type]
             action = self.parse_action()
-            return LabeledStatement(label=label, statement=action)
+            return LabeledStatement(label=label, statement=action)  # type: ignore[arg-type]
 
         return self.parse_action()
 

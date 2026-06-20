@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Annotated, Literal, Union
+
 from pydantic import BaseModel, Field
 
 
@@ -9,7 +11,9 @@ from pydantic import BaseModel, Field
 
 
 class Statement(BaseModel):
-    """所有语句的基类"""
+    """所有语句的基类 —— kind 字段用作 JSON 判别"""
+
+    kind: str
 
 
 # ─── 具体语句 ───────────────────────────────────────────
@@ -18,6 +22,7 @@ class Statement(BaseModel):
 class Enter(Statement):
     """enter Name:emotion —— 角色声明（冒号后为心情）"""
 
+    kind: Literal["enter"] = "enter"  # type: ignore[assignment]
     name: str
     emotion: str
 
@@ -25,12 +30,14 @@ class Enter(Statement):
 class Focus(Statement):
     """focus Name —— 聚焦角色（后续 talk 由该角色发言）"""
 
+    kind: Literal["focus"] = "focus"  # type: ignore[assignment]
     name: str
 
 
 class Unfocus(Statement):
     """unfocus Name —— 取消聚焦"""
 
+    kind: Literal["unfocus"] = "unfocus"  # type: ignore[assignment]
     name: str
 
 
@@ -40,6 +47,7 @@ class Talk(Statement):
     talk  text  —— 等待玩家点击后推进
     """
 
+    kind: Literal["talk"] = "talk"  # type: ignore[assignment]
     text: str
     auto_advance: bool = False  # True = talk& (自动), False = talk (等待点击)
 
@@ -47,6 +55,7 @@ class Talk(Statement):
 class Select(Statement):
     """select { options } -> variable —— 分支选择"""
 
+    kind: Literal["select"] = "select"  # type: ignore[assignment]
     options: list[str]
     variable: str
 
@@ -57,6 +66,7 @@ class Jump(Statement):
     jump var { 0:l1, 1:l2 } —— 条件跳转
     """
 
+    kind: Literal["jump"] = "jump"  # type: ignore[assignment]
     condition: str | None = None  # 条件变量名；None 表示无条件跳转
     mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
 
@@ -64,12 +74,29 @@ class Jump(Statement):
 class LabeledStatement(Statement):
     """label#action —— 带标签的语句"""
 
+    kind: Literal["labeled"] = "labeled"  # type: ignore[assignment]
     label: str
-    statement: Statement
+    statement: Annotated[StatementType, Field(discriminator="kind")]
 
 
 class Exit(Statement):
     """exit —— 终止"""
+
+    kind: Literal["exit"] = "exit"  # type: ignore[assignment]
+
+
+# ─── 判别联合类型（排在所有子类之后，供 LabeledStatement 和 Script 使用）───
+
+StatementType = Union[
+    Enter,
+    Focus,
+    Unfocus,
+    Talk,
+    Select,
+    Jump,
+    LabeledStatement,
+    Exit,
+]
 
 
 # ─── 顶层节点 ───────────────────────────────────────────
@@ -78,4 +105,6 @@ class Exit(Statement):
 class Script(BaseModel):
     """整个剧本的根节点"""
 
-    statements: list[Statement] = Field(default_factory=list)
+    statements: list[Annotated[StatementType, Field(discriminator="kind")]] = Field(
+        default_factory=list
+    )
