@@ -1,12 +1,14 @@
-from scallion import Scallion, visualizer
+from scallion import Scallion
 from scallion.cli import arguments
+from scallion.visualizer import Visualizer
 from rich.console import Console
 
 scallion = Scallion()
+visualizer = Visualizer()
 console = Console(highlight=False)
 
 script = scallion.parse_file(arguments.filename)
-dumper = visualizer.print_ast(script)
+dumper = visualizer.print(script)
 
 with open(arguments.output, "w", encoding="utf8") as f:
     f.write(

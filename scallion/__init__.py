@@ -2,7 +2,7 @@
 
 from .parser import Parser
 from .ast_nodes import Script
-from .visualizer import print_ast
+from .visualizer import Visualizer
 
 
 class Scallion:
@@ -16,4 +16,5 @@ class Scallion:
 
     def dump(self, source: str) -> str:
         script = self.parse(source)
-        return print_ast(script)
+        viz = Visualizer(script)
+        return viz.print()
