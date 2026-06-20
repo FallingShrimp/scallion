@@ -61,22 +61,19 @@ class Select(Statement):
     variable: str
 
 
-class Jump(Statement):
-    """
-    jump label           —— 无条件跳转（condition=None, mappings={}）
-    jump var { 0:l1, 1:l2 } —— 条件跳转
-    """
+class DirectJump(Statement):
+    """jump label —— 无条件跳转"""
 
-    kind: Literal["jump"] = "jump"  # type: ignore[assignment]
-    condition: str | None = None  # 条件变量名；None 表示无条件跳转
+    kind: Literal["direct_jump"] = "direct_jump"  # type: ignore[assignment]
+    target: str
+
+
+class MappingJump(Statement):
+    """jump var { 0:l1, 1:l2 } —— 条件跳转"""
+
+    kind: Literal["mapping_jump"] = "mapping_jump"  # type: ignore[assignment]
+    condition: str
     mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
-
-
-class Title(Statement):
-    """*name —— 剧本标题声明，只能出现在文件第一条"""
-
-    kind: Literal["title"] = "title"  # type: ignore[assignment]
-    name: str
 
 
 class Exit(Statement):
@@ -88,13 +85,13 @@ class Exit(Statement):
 # ─── 判别联合类型（排在所有子类之后，供 LabeledStatement 和 Script 使用）───
 
 StatementType = Union[
-    Title,
     Enter,
     Focus,
     Unfocus,
     Talk,
     Select,
-    Jump,
+    DirectJump,
+    MappingJump,
     Exit,
 ]
 
@@ -105,6 +102,7 @@ StatementType = Union[
 class Script(BaseModel):
     """整个剧本的根节点"""
 
+    title: str | None = None
     statements: list[Annotated[StatementType, Field(discriminator="kind")]] = Field(
         default_factory=list
     )

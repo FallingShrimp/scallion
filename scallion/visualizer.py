@@ -2,13 +2,13 @@
 
 from .ast_nodes import (
     Script,
-    Title,
     Enter,
     Focus,
     Unfocus,
     Talk,
     Select,
-    Jump,
+    DirectJump,
+    MappingJump,
     Exit,
     Statement,
 )
@@ -26,7 +26,8 @@ def _indent(level: int) -> str:
 
 
 def _print_script(script: Script, lines: list[str], indent: int):
-    lines.append(f"{_indent(indent)}Script")
+    title_suffix = f"(title={script.title!r})" if script.title else ""
+    lines.append(f"{_indent(indent)}Script{title_suffix}")
 
     # 语句
     if script.statements:
@@ -41,10 +42,7 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
     # 有标签时加前缀
     tag = f"{stmt.label}#" if stmt.label is not None else ""
 
-    if isinstance(stmt, Title):
-        lines.append(f"{prefix}Title(name={stmt.name!r})")
-
-    elif isinstance(stmt, Enter):
+    if isinstance(stmt, Enter):
         lines.append(
             f"{prefix}{tag}Enter(name={stmt.name!r}, emotion={stmt.emotion!r})"
         )
@@ -64,15 +62,13 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
         for i, opt in enumerate(stmt.options):
             lines.append(f"{_indent(indent + 1)}option[{i}] = {opt!r}")
 
-    elif isinstance(stmt, Jump):
-        if stmt.condition is not None:
-            lines.append(f"{prefix}{tag}Jump(condition={stmt.condition!r}):")
-            for key, label in stmt.mappings.items():
-                lines.append(f"{_indent(indent + 1)}{key} → {label!r}")
-        else:
-            # 无条件跳转
-            target = next(iter(stmt.mappings), "?")
-            lines.append(f"{prefix}{tag}Jump(target={target!r})")
+    elif isinstance(stmt, DirectJump):
+        lines.append(f"{prefix}{tag}DirectJump(target={stmt.target!r})")
+
+    elif isinstance(stmt, MappingJump):
+        lines.append(f"{prefix}{tag}MappingJump(condition={stmt.condition!r}):")
+        for key, label in stmt.mappings.items():
+            lines.append(f"{_indent(indent + 1)}{key} → {label!r}")
 
     elif isinstance(stmt, Exit):
         lines.append(f"{prefix}{tag}Exit")

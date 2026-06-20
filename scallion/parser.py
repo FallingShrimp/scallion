@@ -5,13 +5,13 @@ from typing import List, Optional
 
 from .ast_nodes import (
     Script,
-    Title,
     Enter,
     Focus,
     Unfocus,
     Talk,
     Select,
-    Jump,
+    DirectJump,
+    MappingJump,
     Exit,
     Statement,
 )
@@ -156,32 +156,31 @@ class Parser:
 
     def parse(self) -> Script:
         """Script → Title? Statement*"""
+        title: str | None = None
         statements: list[Statement] = []
-        first = True
+
+        self.skip_newlines()
+        if self.pos < len(self.tokens) and self.check("STAR"):
+            title = self.parse_title()
 
         while self.pos < len(self.tokens):
             self.skip_newlines()
             if self.pos >= len(self.tokens):
                 break
-            if first and self.check("STAR"):
-                statements.append(self.parse_title())
-                first = False
-            else:
-                first = False
-                stmt = self.parse_statement()
-                if stmt is not None:
-                    statements.append(stmt)
+            stmt = self.parse_statement()
+            if stmt is not None:
+                statements.append(stmt)
 
-        return Script(statements=statements)  # type: ignore[arg-type]
+        return Script(title=title, statements=statements)  # type: ignore[arg-type]
 
-    def parse_title(self) -> Title:
-        """STAR TEXT* NEWLINE"""
+    def parse_title(self) -> str:
+        """STAR TEXT* NEWLINE → 返回标题字符串"""
         self.consume("STAR")
         parts: list[str] = []
         while not self.check("NEWLINE"):
             parts.append(self.advance().value)
         self.consume("NEWLINE")
-        return Title(name=" ".join(parts))
+        return " ".join(parts)
 
     def parse_enter(self) -> Enter:
         """enter ID : ID NEWLINE"""
@@ -298,13 +297,13 @@ class Parser:
 
     # ── jump 语句 ────────────────────────────────────
 
-    def parse_jump(self) -> Jump:
+    def parse_jump(self) -> DirectJump | MappingJump:
         """
-        jump ID NEWLINE                           → 无条件跳转
+        jump ID NEWLINE                           → DirectJump
         jump ID LBRACE NEWLINE
             INTEGER COLON ID NEWLINE
             INTEGER COLON ID NEWLINE
-        RBRACE NEWLINE                            → 条件跳转
+        RBRACE NEWLINE                            → MappingJump
         """
         self.consume("JUMP")
         target = self.consume("ID", "跳转目标或条件变量").value
@@ -312,7 +311,7 @@ class Parser:
         if self.check("NEWLINE"):
             # 无条件跳转
             self.advance()
-            return Jump(condition=None, mappings={target: target})
+            return DirectJump(target=target)
 
         # 条件跳转
         self.consume("LBRACE")
@@ -329,4 +328,4 @@ class Parser:
         self.consume("RBRACE")
         self.consume("NEWLINE")
 
-        return Jump(condition=target, mappings=mappings)
+        return MappingJump(condition=target, mappings=mappings)
