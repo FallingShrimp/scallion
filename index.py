@@ -1,8 +1,9 @@
 from scallion import Scallion, visualizer
 from scallion.cli import arguments
-
+from rich.console import Console
 
 scallion = Scallion()
+console = Console(highlight=False)
 
 script = scallion.parse_file(arguments.filename)
 dumper = visualizer.print_ast(script)
@@ -14,4 +15,4 @@ with open(arguments.output, "w", encoding="utf8") as f:
             by_alias=True,
         )
     )
-print(dumper)
+console.print(dumper)

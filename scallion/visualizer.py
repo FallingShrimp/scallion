@@ -18,7 +18,9 @@ from .ast_nodes import (
 def print_ast(script: Script) -> str:
     """将 AST 转为带缩进的可读字符串"""
     lines: list[str] = []
+    lines.append("[white]")
     _print_script(script, lines, indent=0)
+    lines.append("[/white]")
     return "\n".join(lines)
 
 
@@ -41,7 +43,7 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
     prefix = _indent(indent)
 
     # 有标签时加前缀
-    tag = f"{stmt.label}#" if stmt.label is not None else ""
+    tag = f"[yellow]\\[{stmt.label}][/yellow] " if stmt.label is not None else ""
 
     if isinstance(stmt, Enter):
         lines.append(
