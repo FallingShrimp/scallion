@@ -72,6 +72,13 @@ class Jump(Statement):
     mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
 
 
+class Title(Statement):
+    """*name —— 剧本标题声明，只能出现在文件第一条"""
+
+    kind: Literal["title"] = "title"  # type: ignore[assignment]
+    name: str
+
+
 class Exit(Statement):
     """exit —— 终止"""
 
@@ -81,6 +88,7 @@ class Exit(Statement):
 # ─── 判别联合类型（排在所有子类之后，供 LabeledStatement 和 Script 使用）───
 
 StatementType = Union[
+    Title,
     Enter,
     Focus,
     Unfocus,

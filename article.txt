@@ -1,3 +1,4 @@
+*day start
 enter Tera:a
 enter Pico:b
 focus Tera

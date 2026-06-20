@@ -2,6 +2,7 @@
 
 from .ast_nodes import (
     Script,
+    Title,
     Enter,
     Focus,
     Unfocus,
@@ -40,7 +41,10 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
     # 有标签时加前缀
     tag = f"{stmt.label}#" if stmt.label is not None else ""
 
-    if isinstance(stmt, Enter):
+    if isinstance(stmt, Title):
+        lines.append(f"{prefix}Title(name={stmt.name!r})")
+
+    elif isinstance(stmt, Enter):
         lines.append(
             f"{prefix}{tag}Enter(name={stmt.name!r}, emotion={stmt.emotion!r})"
         )

@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from .ast_nodes import (
     Script,
+    Title,
     Enter,
     Focus,
     Unfocus,
@@ -33,6 +34,7 @@ TOKEN_SPEC: List[tuple[str, str]] = [
     ("JUMP", r"jump\b"),
     ("EXIT", r"exit\b"),
     # 结构符号
+    ("STAR", r"\*"),
     ("LBRACE", r"\{"),
     ("RBRACE", r"\}"),
     ("ARROW", r"->"),
@@ -153,18 +155,33 @@ class Parser:
     # ── 顶层解析 ─────────────────────────────────────
 
     def parse(self) -> Script:
-        """Script → Statement*"""
+        """Script → Title? Statement*"""
         statements: list[Statement] = []
+        first = True
 
         while self.pos < len(self.tokens):
             self.skip_newlines()
             if self.pos >= len(self.tokens):
                 break
-            stmt = self.parse_statement()
-            if stmt is not None:
-                statements.append(stmt)
+            if first and self.check("STAR"):
+                statements.append(self.parse_title())
+                first = False
+            else:
+                first = False
+                stmt = self.parse_statement()
+                if stmt is not None:
+                    statements.append(stmt)
 
         return Script(statements=statements)  # type: ignore[arg-type]
+
+    def parse_title(self) -> Title:
+        """STAR TEXT* NEWLINE"""
+        self.consume("STAR")
+        parts: list[str] = []
+        while not self.check("NEWLINE"):
+            parts.append(self.advance().value)
+        self.consume("NEWLINE")
+        return Title(name=" ".join(parts))
 
     def parse_enter(self) -> Enter:
         """enter ID : ID NEWLINE"""
