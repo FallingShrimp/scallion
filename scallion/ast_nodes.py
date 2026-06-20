@@ -50,7 +50,9 @@ class Talk(Statement):
 
     kind: Literal["talk"] = "talk"  # type: ignore[assignment]
     text: str
-    auto_advance: bool = False  # True = talk& (自动), False = talk (等待点击)
+    await_: bool = Field(
+        default=False, alias="await"
+    )  # True = talk& (自动), False = talk (等待点击)
 
 
 class Select(Statement):
@@ -76,6 +78,14 @@ class MappingJump(Statement):
     mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
 
 
+class Play(Statement):
+    """play resource / play& resource —— 播放资源"""
+
+    kind: Literal["play"] = "play"  # type: ignore[assignment]
+    resource: str
+    await_: bool = Field(default=False, alias="await")  # True = play& (等待播放完毕)
+
+
 class Exit(Statement):
     """exit —— 终止"""
 
@@ -89,6 +99,7 @@ StatementType = Union[
     Focus,
     Unfocus,
     Talk,
+    Play,
     Select,
     DirectJump,
     MappingJump,

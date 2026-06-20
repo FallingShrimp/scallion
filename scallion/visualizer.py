@@ -6,6 +6,7 @@ from .ast_nodes import (
     Focus,
     Unfocus,
     Talk,
+    Play,
     Select,
     DirectJump,
     MappingJump,
@@ -54,8 +55,12 @@ def _print_stmt(stmt: Statement, lines: list[str], indent: int):
         lines.append(f"{prefix}{tag}Unfocus(name={stmt.name!r})")
 
     elif isinstance(stmt, Talk):
-        mode = "auto" if stmt.auto_advance else "click"
+        mode = "auto" if stmt.await_ else "click"
         lines.append(f"{prefix}{tag}Talk(mode={mode!r}, text={stmt.text!r})")
+
+    elif isinstance(stmt, Play):
+        mode = "await" if stmt.await_ else "fire"
+        lines.append(f"{prefix}{tag}Play(mode={mode!r}, resource={stmt.resource!r})")
 
     elif isinstance(stmt, Select):
         lines.append(f"{prefix}{tag}Select(variable={stmt.variable!r}):")

@@ -14,7 +14,10 @@ jump eat? {
     1:uneaten
 }
 eaten#talk 你好Tera！我已经吃饭了。
+play& pico-eating.png
+play pico-eaten.mp4
 jump e
 uneaten#talk 你好Tera！我还没吃饭。
+play pico-uneaten.wav
 jump e
 e#exit

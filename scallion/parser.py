@@ -9,6 +9,7 @@ from .ast_nodes import (
     Focus,
     Unfocus,
     Talk,
+    Play,
     Select,
     DirectJump,
     MappingJump,
@@ -28,6 +29,8 @@ TOKEN_SPEC: List[tuple[str, str]] = [
     ("ENTER", r"enter\b"),
     ("FOCUS", r"focus\b"),
     ("UNFOCUS", r"unfocus\b"),
+    ("PLAY_AWAIT", r"play&"),
+    ("PLAY_NOWAIT", r"play\b"),
     ("TALK_AUTO", r"talk&"),
     ("TALK_CLICK", r"talk\b"),
     ("SELECT", r"select\b"),
@@ -250,7 +253,17 @@ class Parser:
                 parts.append(self.advance().value)
             text = "".join(parts)
             self.consume("NEWLINE")
-            return Talk(text=text, auto_advance=auto)
+            return Talk.model_validate({"text": text, "await": not auto})
+
+        elif tok.kind in ("PLAY_AWAIT", "PLAY_NOWAIT"):
+            is_await = tok.kind == "PLAY_AWAIT"
+            self.advance()
+            res_parts: List[str] = []
+            while not self.check("NEWLINE"):
+                res_parts.append(self.advance().value)
+            resource = "".join(res_parts)
+            self.consume("NEWLINE")
+            return Play.model_validate({"resource": resource, "await": is_await})
 
         elif tok.kind == "SELECT":
             return self.parse_select()
