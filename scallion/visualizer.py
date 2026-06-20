@@ -8,7 +8,6 @@ from .ast_nodes import (
     Talk,
     Select,
     Jump,
-    LabeledStatement,
     Exit,
     Statement,
 )
@@ -38,40 +37,41 @@ def _print_script(script: Script, lines: list[str], indent: int):
 def _print_stmt(stmt: Statement, lines: list[str], indent: int):
     prefix = _indent(indent)
 
-    if isinstance(stmt, LabeledStatement):
-        lines.append(f"{prefix}LabeledStatement(label={stmt.label!r}):")
-        _print_stmt(stmt.statement, lines, indent + 1)
+    # 有标签时加前缀
+    tag = f"{stmt.label}#" if stmt.label is not None else ""
 
-    elif isinstance(stmt, Enter):
-        lines.append(f"{prefix}Enter(name={stmt.name!r}, emotion={stmt.emotion!r})")
+    if isinstance(stmt, Enter):
+        lines.append(
+            f"{prefix}{tag}Enter(name={stmt.name!r}, emotion={stmt.emotion!r})"
+        )
 
     elif isinstance(stmt, Focus):
-        lines.append(f"{prefix}Focus(name={stmt.name!r})")
+        lines.append(f"{prefix}{tag}Focus(name={stmt.name!r})")
 
     elif isinstance(stmt, Unfocus):
-        lines.append(f"{prefix}Unfocus(name={stmt.name!r})")
+        lines.append(f"{prefix}{tag}Unfocus(name={stmt.name!r})")
 
     elif isinstance(stmt, Talk):
         mode = "auto" if stmt.auto_advance else "click"
-        lines.append(f"{prefix}Talk(mode={mode!r}, text={stmt.text!r})")
+        lines.append(f"{prefix}{tag}Talk(mode={mode!r}, text={stmt.text!r})")
 
     elif isinstance(stmt, Select):
-        lines.append(f"{prefix}Select(variable={stmt.variable!r}):")
+        lines.append(f"{prefix}{tag}Select(variable={stmt.variable!r}):")
         for i, opt in enumerate(stmt.options):
             lines.append(f"{_indent(indent + 1)}option[{i}] = {opt!r}")
 
     elif isinstance(stmt, Jump):
         if stmt.condition is not None:
-            lines.append(f"{prefix}Jump(condition={stmt.condition!r}):")
+            lines.append(f"{prefix}{tag}Jump(condition={stmt.condition!r}):")
             for key, label in stmt.mappings.items():
                 lines.append(f"{_indent(indent + 1)}{key} → {label!r}")
         else:
             # 无条件跳转
             target = next(iter(stmt.mappings), "?")
-            lines.append(f"{prefix}Jump(target={target!r})")
+            lines.append(f"{prefix}{tag}Jump(target={target!r})")
 
     elif isinstance(stmt, Exit):
-        lines.append(f"{prefix}Exit")
+        lines.append(f"{prefix}{tag}Exit")
 
     else:
         lines.append(f"{prefix}{stmt.__class__.__name__}")

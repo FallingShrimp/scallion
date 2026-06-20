@@ -11,7 +11,6 @@ from .ast_nodes import (
     Talk,
     Select,
     Jump,
-    LabeledStatement,
     Exit,
     Statement,
 )
@@ -180,19 +179,21 @@ class Parser:
 
     def parse_statement(self) -> Optional[Statement]:
         """
-        Statement → LabeledStatement | Action
-        LabeledStatement → ID HASH Action
+        Statement → [ID HASH] Action
         """
         if self.check("ID") and self.peek(1).kind == "HASH":
             # label#action
             label = self.advance().value
             self.consume("HASH")
+            stmt: Statement
             if self.check("NEWLINE"):
                 # label# 后面没有内容，视为 exit
                 self.advance()
-                return LabeledStatement(label=label, statement=Exit())  # type: ignore[arg-type]
-            action = self.parse_action()
-            return LabeledStatement(label=label, statement=action)  # type: ignore[arg-type]
+                stmt = Exit()
+            else:
+                stmt = self.parse_action()
+            stmt.label = label
+            return stmt
 
         return self.parse_action()
 

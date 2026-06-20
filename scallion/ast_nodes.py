@@ -11,9 +11,10 @@ from pydantic import BaseModel, Field
 
 
 class Statement(BaseModel):
-    """所有语句的基类 —— kind 字段用作 JSON 判别"""
+    """所有语句的基类 —— kind 用作 JSON 判别，label 为可选标签"""
 
     kind: str
+    label: str | None = None
 
 
 # ─── 具体语句 ───────────────────────────────────────────
@@ -71,14 +72,6 @@ class Jump(Statement):
     mappings: dict[str, str] = Field(default_factory=dict)  # 值 → 标签
 
 
-class LabeledStatement(Statement):
-    """label#action —— 带标签的语句"""
-
-    kind: Literal["labeled"] = "labeled"  # type: ignore[assignment]
-    label: str
-    statement: Annotated[StatementType, Field(discriminator="kind")]
-
-
 class Exit(Statement):
     """exit —— 终止"""
 
@@ -94,7 +87,6 @@ StatementType = Union[
     Talk,
     Select,
     Jump,
-    LabeledStatement,
     Exit,
 ]
 
