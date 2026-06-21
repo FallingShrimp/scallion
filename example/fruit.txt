@@ -1,0 +1,47 @@
+*fruit stand
+
+// Tera 和 Pico 在集市摆摊卖水果
+enter Tera:happy
+enter Pico:normal
+
+focus Tera
+talk& 欢迎光临！今天的水果都是早上刚到的，特别新鲜！
+
+select {
+    我想买苹果
+    我想买香蕉
+    我想买葡萄
+} -> fruit?
+
+unfocus Tera
+focus Pico
+
+play& cash-register.wav
+
+jump fruit? {
+    0:apple
+    1:banana
+    2:grape
+}
+
+apple#talk 好的，苹果一斤五元，又脆又甜！
+play apple-red.png
+talk& 已经帮您装好了，请扫码支付！
+jump end
+
+banana#talk 香蕉刚好熟到最佳状态，口感绵密！
+play banana-yellow.png
+talk 需要我帮您剥开吗？
+play& peel-banana.mp4
+jump end
+
+grape#talk 葡萄是今早从果园直采的，无籽超甜！
+play& grape-purple.mp4
+talk 谢谢惠顾，欢迎下次再来！
+jump end
+
+end#unfocus Pico
+focus Tera
+talk& 慢走哦，常来光顾！
+
+e#exit
