@@ -5,3 +5,5 @@ class Arguments(Namespace):
     filename: str
     output: str
     format: int
+    watch: bool
+    port: int

@@ -1,2 +1,4 @@
 pydantic
 rich
+watchdog
+websockets

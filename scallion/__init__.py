@@ -2,6 +2,7 @@
 
 from .parser import Parser
 from .ast_nodes import Script
+from .event_subscriber import EventSubscriber
 from .visualizer import Visualizer
 
 

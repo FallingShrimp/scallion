@@ -6,6 +6,8 @@ parser = ArgumentParser()
 parser.add_argument("filename")
 parser.add_argument("-o", "--output", type=str, default="")
 parser.add_argument("-f", "--format", type=int, default=0)
+parser.add_argument("-w", "--watch", action="store_true", default=False)
+parser.add_argument("-p", "--port", type=int, default=0)
 
 arguments = parser.parse_args(namespace=Arguments())
 
