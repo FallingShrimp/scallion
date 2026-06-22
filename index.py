@@ -10,11 +10,14 @@ console = Console(highlight=False)
 script = scallion.parse_file(arguments.filename)
 dumper = visualizer.print(script)
 
-with open(arguments.output, "w", encoding="utf8") as f:
-    f.write(
-        script.model_dump_json(
-            indent=arguments.format if arguments.format > 0 else None,
-            by_alias=True,
+try:
+    with open(arguments.output, "w", encoding="utf8") as f:
+        f.write(
+            script.model_dump_json(
+                indent=arguments.format if arguments.format > 0 else None,
+                by_alias=True,
+            )
         )
-    )
+except FileNotFoundError:
+    pass
 console.print(dumper)

@@ -47,11 +47,11 @@ TOKEN_SPEC: List[tuple[str, str]] = [
     ("INTEGER", r"\d+"),
     ("ID", ID_RE),
     # 自由文本（非空白开头直到行尾）
-    ("TEXT", r"[^\s][^\n]*"),
     # 空白 / 注释
     ("NEWLINE", r"\n"),
     ("SKIP", r"[ \t]+"),
     ("COMMENT", r"//[^\n]*"),
+    ("TEXT", r"[^\s][^\n]*"),
 ]
 
 TOKEN_RE = "|".join(f"(?P<{name}>{pattern})" for name, pattern in TOKEN_SPEC)
@@ -92,6 +92,10 @@ def tokenize(source: str) -> List[Token]:
         elif kind in ("SKIP", "COMMENT"):
             continue
         else:
+            if kind == "TEXT" and "//" in value:
+                value = value.split("//", 1)[0].rstrip()
+                if not value:
+                    continue
             tokens.append(Token(kind, value, line_no, col))
 
     # 确保末尾有 NEWLINE，简化解析器
