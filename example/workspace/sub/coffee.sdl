@@ -1,0 +1,29 @@
+*coffee shop
+
+enter Bob:smiling
+
+focus Bob
+talk 早上好！来杯咖啡吗？
+
+select {
+    美式咖啡
+    拿铁
+    卡布奇诺
+} -> coffee?
+
+play& coffee-machine.wav
+
+jump coffee? {
+    0:americano
+    1:latte
+    2:cappuccino
+}
+
+americano#talk 您的冰美式来了！
+jump leave
+
+latte#talk 这是你的拿铁，奶泡打得很细腻！
+jump leave
+
+cappuccino#talk 卡布奇诺，请慢用！
+leave#exit

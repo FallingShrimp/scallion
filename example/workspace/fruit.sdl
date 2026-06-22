@@ -1,0 +1,26 @@
+*fruit stand
+
+enter Tera:happy
+enter Pico:normal
+
+focus Tera
+talk& 欢迎光临！今天的水果都是早上刚到的！
+
+select {
+    我想买苹果
+    我想买香蕉
+} -> fruit?
+
+focus Pico
+play& cash-register.wav
+
+jump fruit? {
+    0:bought_apple
+    1:bought_banana
+}
+
+bought_apple#talk 这是您的苹果！
+jump end
+
+bought_banana#talk 这是您的香蕉！
+end#exit

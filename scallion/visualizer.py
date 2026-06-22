@@ -26,6 +26,7 @@ class Visualizer:
             self.script = script
         if self.script is None:
             raise ValueError("No script node given.")
+        self.lines.clear()
         self.add_line("[white]", use_prefix=False, use_tag=False)
         self.parse_lines()
         self.add_line("[/white]", use_prefix=False, use_tag=False)

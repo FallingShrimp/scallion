@@ -7,3 +7,4 @@ class Arguments(Namespace):
     format: int
     watch: bool
     port: int
+    is_workspace: bool
