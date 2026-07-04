@@ -17,8 +17,8 @@ from watchdog.observers import Observer
 from websockets.asyncio.server import Server, ServerConnection
 
 from scallion.event_subscriber import EventSubscriber
-from .events import BaseEvent
 
+from .events import BaseEvent
 
 # ─── watchdog 事件处理器（内部类）───────────────────────
 

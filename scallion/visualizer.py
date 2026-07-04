@@ -1,16 +1,16 @@
 """Scallion AST 可视化输出"""
 
 from .ast_nodes import (
-    Script,
-    Enter,
-    Focus,
-    Unfocus,
-    Talk,
-    Play,
-    Select,
     DirectJump,
-    MappingJump,
+    Enter,
     Exit,
+    Focus,
+    MappingJump,
+    Play,
+    Script,
+    Select,
+    Talk,
+    Unfocus,
 )
 
 

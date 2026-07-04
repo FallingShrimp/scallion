@@ -1,8 +1,7 @@
 """Scallion —— 高效剧本描述语言解析器"""
 
-from .parser import Parser
 from .ast_nodes import Script
-from .event_subscriber import EventSubscriber
+from .parser import Parser
 from .visualizer import Visualizer
 
 
@@ -12,7 +11,7 @@ class Scallion:
         return parser.parse()
 
     def parse_file(self, filepath: str) -> Script:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             return self.parse(f.read())
 
     def dump(self, source: str) -> str:

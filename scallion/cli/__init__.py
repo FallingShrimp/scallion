@@ -1,6 +1,7 @@
-from argparse import ArgumentParser
 import os
-from scallion.cli.structs import Arguments
+from argparse import ArgumentParser
+
+from .structs import Arguments
 
 parser = ArgumentParser()
 parser.add_argument("filename")

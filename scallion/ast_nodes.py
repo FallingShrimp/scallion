@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
-
 
 # ─── 语句基类 ───────────────────────────────────────────
 
@@ -94,17 +93,9 @@ class Exit(Statement):
 
 # ─── 判别联合类型（排在所有子类之后，供 LabeledStatement 和 Script 使用）───
 
-StatementType = Union[
-    Enter,
-    Focus,
-    Unfocus,
-    Talk,
-    Play,
-    Select,
-    DirectJump,
-    MappingJump,
-    Exit,
-]
+StatementType = (
+    Enter | Focus | Unfocus | Talk | Play | Select | DirectJump | MappingJump | Exit
+)
 
 
 # ─── 顶层节点 ───────────────────────────────────────────

@@ -1,20 +1,19 @@
 """Scallion 剧本描述语言 —— 词法分析器 + 递归下降解析器"""
 
 import re
-from typing import List, Optional
 
 from .ast_nodes import (
-    Script,
-    Enter,
-    Focus,
-    Unfocus,
-    Talk,
-    Play,
-    Select,
     DirectJump,
-    MappingJump,
+    Enter,
     Exit,
+    Focus,
+    MappingJump,
+    Play,
+    Script,
+    Select,
     Statement,
+    Talk,
+    Unfocus,
 )
 
 # ─── 标识符定义（唯一常量，扩展只需改此处）─────────────
@@ -24,7 +23,7 @@ ID_RE = r"[a-zA-Z_]\w*\??"
 # ─── Token 定义 ────────────────────────────────────────
 # 顺序敏感：关键字优先于 ID，结构符优先于 TEXT
 
-TOKEN_SPEC: List[tuple[str, str]] = [
+TOKEN_SPEC: list[tuple[str, str]] = [
     # 关键字
     ("ENTER", r"enter\b"),
     ("FOCUS", r"focus\b"),
@@ -73,9 +72,9 @@ class Token:
 # ─── 词法分析 ───────────────────────────────────────────
 
 
-def tokenize(source: str) -> List[Token]:
+def tokenize(source: str) -> list[Token]:
     """将源码字符串转为 Token 列表，滤除 SKIP 和 COMMENT"""
-    tokens: List[Token] = []
+    tokens: list[Token] = []
     line_no = 1
     line_start = 0
 
@@ -109,7 +108,7 @@ def tokenize(source: str) -> List[Token]:
 
 
 class ParseError(Exception):
-    def __init__(self, msg: str, token: Optional[Token] = None):
+    def __init__(self, msg: str, token: Token | None = None):
         if token:
             super().__init__(
                 f"第{token.line}行第{token.col}列: {msg}\n  当前 token: {token}"
@@ -122,7 +121,7 @@ class Parser:
     """递归下降解析器 —— 基于 Token 流"""
 
     def __init__(self, source: str):
-        self.tokens: List[Token] = tokenize(source)
+        self.tokens: list[Token] = tokenize(source)
         self.pos: int = 0
 
     # ── Token 工具 ───────────────────────────────────
@@ -200,7 +199,7 @@ class Parser:
 
     # ── 语句解析 ─────────────────────────────────────
 
-    def parse_statement(self) -> Optional[Statement]:
+    def parse_statement(self) -> Statement | None:
         """
         Statement → [ID HASH] Action
         """
@@ -252,7 +251,7 @@ class Parser:
             auto = tok.kind == "TALK_AUTO"
             self.advance()
             # 收集直到行尾的全部 token 作为对话文本
-            parts: List[str] = []
+            parts: list[str] = []
             while not self.check("NEWLINE"):
                 parts.append(self.advance().value)
             text = "".join(parts)
@@ -262,7 +261,7 @@ class Parser:
         elif tok.kind in ("PLAY_AWAIT", "PLAY_NOWAIT"):
             is_await = tok.kind == "PLAY_AWAIT"
             self.advance()
-            res_parts: List[str] = []
+            res_parts: list[str] = []
             while not self.check("NEWLINE"):
                 res_parts.append(self.advance().value)
             resource = "".join(res_parts)
@@ -296,10 +295,10 @@ class Parser:
         self.consume("LBRACE")
         self.consume("NEWLINE")
 
-        options: List[str] = []
+        options: list[str] = []
         while not self.check("RBRACE"):
             # 收集一行上的全部 token 作为选项文本
-            parts: List[str] = []
+            parts: list[str] = []
             while not self.check("NEWLINE"):
                 parts.append(self.advance().value)
             self.consume("NEWLINE")
