@@ -14,7 +14,7 @@ class Scallion:
         with open(filepath, encoding="utf-8") as f:
             return self.parse(f.read())
 
-    def dump(self, source: str) -> str:
+    def dump(self, source: str, highlight: bool = True) -> str:
         script = self.parse(source)
-        viz = Visualizer(script)
+        viz = Visualizer(script, highlight=highlight)
         return viz.print()

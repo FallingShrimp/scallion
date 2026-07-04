@@ -1,5 +1,7 @@
 """Scallion AST 可视化输出"""
 
+from rich.text import Text
+
 from .ast_nodes import (
     DirectJump,
     Enter,
@@ -15,8 +17,9 @@ from .ast_nodes import (
 
 
 class Visualizer:
-    def __init__(self, script: Script | None = None) -> None:
+    def __init__(self, script: Script | None = None, highlight: bool = True) -> None:
         self.script = script
+        self.highlight = highlight
         self.lines: list[str] = []
         self.prefix = ""
         self.tag: str | None = None
@@ -30,7 +33,8 @@ class Visualizer:
         self.add_line("[white]", use_prefix=False, use_tag=False)
         self.parse_lines()
         self.add_line("[/white]", use_prefix=False, use_tag=False)
-        return "\n".join(self.lines)
+        text = Text("\n".join(self.lines))
+        return text.markup if self.highlight else text.plain
 
     def prefix_indent(self, level: int) -> str:
         return "│   " * level
