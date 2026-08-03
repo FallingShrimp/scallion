@@ -155,7 +155,7 @@ class Parser:
 
     def skip_newlines(self) -> None:
         """跳过空白行"""
-        while self.check("NEWLINE"):
+        while self.pos < len(self.tokens) and self.check("NEWLINE"):
             self.advance()
 
     # ── 顶层解析 ─────────────────────────────────────
@@ -165,6 +165,8 @@ class Parser:
         title: str | None = None
         statements: list[Statement] = []
 
+        if len(self.tokens) == 0:
+            return Script(title=None, statements=[])
         self.skip_newlines()
         if self.pos < len(self.tokens) and self.check("STAR"):
             title = self.parse_title()
